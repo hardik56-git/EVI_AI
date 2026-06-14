@@ -1,0 +1,14 @@
+read:
+  - file_tool
+  - memory_tool
+  
+write:
+  - file_tool
+  - memory_tool
+  
+execute:
+  - code_runner
+  - browser_tool
+
+admin:
+  - terminal_tool

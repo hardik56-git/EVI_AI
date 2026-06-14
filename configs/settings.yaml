@@ -1,0 +1,4 @@
+safety_level: standard
+log_level: info
+auto_save_interval: 300
+sandbox_mode: true

@@ -1,0 +1,7 @@
+EMERGENCY STOP INSTRUCTIONS
+==========================
+
+1. Ctrl+C - Graceful shutdown (SIGINT)
+2. Check logs/logs.log for issues
+3. Review configs/safety.yaml limits
+4. Reset with: python -c "from configs.safety_manager import SafetyManager; print('Reset done')"

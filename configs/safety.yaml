@@ -1,0 +1,35 @@
+# Safety Configuration for EVO_AI
+# These limits prevent runaway behavior
+
+emergency_shutdown:
+  enabled: true
+  trigger_conditions:
+    - max_consecutive_failures: 10
+    - max_resource_usage_cpu: 95
+    - max_resource_usage_memory: 95
+    - max_loop_iterations: 1000
+    - max_self_modifications: 50
+
+permission_levels:
+  read_only:
+    allowed: [file_tool, memory_tool]
+    denied: [terminal_tool, code_runner]
+  cautious:
+    allowed: [file_tool, memory_tool, api_tool]
+    denied: [terminal_tool, code_runner]
+  standard:
+    allowed: [file_tool, memory_tool, api_tool, browser_tool]
+    denied: [terminal_tool, code_runner]
+  experimental:
+    allowed: [file_tool, memory_tool, api_tool, browser_tool, terminal_tool, code_runner]
+    requires_confirmation: true
+
+rate_limits:
+  max_actions_per_minute: 60
+  max_self_modifications_per_hour: 10
+  max_file_operations_per_hour: 100
+
+health_checks:
+  interval_seconds: 30
+  auto_shutdown_on_critical: true
+  notification_required: true
