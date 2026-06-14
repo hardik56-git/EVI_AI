@@ -30,7 +30,7 @@ def index():
         button { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-execute { background: #4299e1; color: white; }
         .btn-stop { background: #e53e3e; color: white; }
-        #result { margin-top: 20px; padding: 15px; background: #f7fafc; border-radius: 6px; white-space: pre-wrap; font-family: 'Segoe UI', sans-serif; font-size: 14px; min-height: 100px; border: 1px solid #e2e8f0; }
+        #result { margin-top: 20px; padding: 15px; background: #f7fafc; border-radius: 6px; font-family: 'Segoe UI', sans-serif; font-size: 14px; min-height: 100px; border: 1px solid #e2e8f0; line-height: 1.6; }
         .output-section { margin-top: 15px; }
         .output-title { font-weight: bold; color: #4a5568; margin-bottom: 8px; }
     </style>
@@ -75,38 +75,33 @@ async function fetchStatus() {
 }
 
 function formatOutput(data) {
-    if (data.status === 'error') return `❌ Error: ${data.message}`;
+    if (data.status === 'error') return `<span style="color:red">❌ Error: ${data.message}</span>`;
+    if (data.response) return data.response.replace(/\n/g, '<br>');
     
-    let output = `🎯 Goal: ${data.goal}\n\n📋 Plan Created:\n`;
-    data.plan.steps.forEach((s, i) => {
-        const detail = data.result.results[i]?.details || '';
-        output += `  ${i+1}. ${s}${detail ? ' - ' + detail : ''}\n`;
-    });
-    
-    output += `\n⚡ Execution: ${data.result.status.toUpperCase()}\n`;
-    output += `📊 ${data.evaluation.feedback}\n`;
-    output += `💯 Score: ${Math.round(data.evaluation.score * 100)}%`;
-    
+    // Fallback for older response format
+    let output = `I've processed your request: ${data.goal}<br><br>`;
+    output += `Status: ${data.result?.status || 'unknown'}<br>`;
+    output += `Score: ${Math.round((data.evaluation?.score || 0) * 100)}%`;
     return output;
 }
 
 async function sendGoal() {
     const goal = document.getElementById('goal').value;
     if (!goal) return;
-    document.getElementById('result').textContent = 'Processing...';
+    document.getElementById('result').innerHTML = 'Processing...';
     const res = await fetch('/api/execute', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({goal: goal})
     });
     const data = await res.json();
-    document.getElementById('result').textContent = formatOutput(data);
+    document.getElementById('result').innerHTML = formatOutput(data);
 }
 
 async function emergencyStop() {
     if (confirm('Are you sure? This will stop EVO_AI immediately!')) {
         await fetch('/api/emergency_stop', {method: 'POST'});
-        document.getElementById('result').textContent = 'EMERGENCY STOP ACTIVATED';
+        document.getElementById('result').innerHTML = 'EMERGENCY STOP ACTIVATED';
     }
 }
 

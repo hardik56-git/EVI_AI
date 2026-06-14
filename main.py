@@ -4,6 +4,7 @@ import sys
 from core.brain import Brain
 from core.planner import Planner
 from core.executor import Executor
+from core.language_generator import LanguageGenerator
 from self_improvement.evaluator import Evaluator
 from configs.safety_manager import SafetyManager
 
@@ -14,6 +15,7 @@ class EVOAI:
         self.planner = Planner(self.safety_manager)
         self.executor = Executor(self.safety_manager)
         self.evaluator = Evaluator(self.safety_manager)
+        self.generator = LanguageGenerator(self.safety_manager)
         self.running = False
         self.emergency_lock = threading.Lock()
         
@@ -42,4 +44,6 @@ class EVOAI:
             
         result = self.executor.execute(plan)
         evaluation = self.evaluator.evaluate(result)
-        return {"goal": goal, "plan": plan, "result": result, "evaluation": evaluation}
+        response = self.generator.generate_response(goal, plan, result, evaluation)
+        
+        return {"goal": goal, "plan": plan, "result": result, "evaluation": evaluation, "response": response}
