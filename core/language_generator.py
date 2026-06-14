@@ -11,7 +11,7 @@ class LanguageGenerator:
         if "study" in goal.lower():
             return self._study_plan_response(goal, result)
             
-        if "code" in goal.lower() or "program" in goal.lower() or "write" in goal.lower():
+        if "code" in goal.lower() or "program" in goal.lower() or "write" in goal.lower() or "create" in goal.lower():
             return self._coding_response(goal, result)
             
         if "help" in goal.lower() or "what" in goal.lower() or "can you" in goal.lower():

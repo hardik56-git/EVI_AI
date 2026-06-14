@@ -5,6 +5,7 @@ from main import EVOAI
 
 app = Flask(__name__)
 ai = EVOAI()
+ai.start()  # Start AI when module loads
 
 @app.route('/')
 def index():
@@ -119,6 +120,9 @@ def status():
 def execute():
     goal = request.json.get('goal', '')
     result = ai.run_cycle(goal)
+    # Debug: ensure response is included
+    if 'response' not in result and goal:
+        result['response'] = f"Processed: {goal}. Status: {result.get('result', {}).get('status', 'unknown')}"
     return jsonify(result)
 
 @app.route('/api/emergency_stop', methods=['POST'])

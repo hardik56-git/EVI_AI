@@ -20,8 +20,6 @@ class EVOAI:
         self.emergency_lock = threading.Lock()
         
     def start(self):
-        signal.signal(signal.SIGINT, self.emergency_shutdown)
-        signal.signal(signal.SIGTERM, self.emergency_shutdown)
         self.running = True
         print("EVO_AI started with safety controls active")
         
