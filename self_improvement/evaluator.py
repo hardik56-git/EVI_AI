@@ -1,23 +1,20 @@
-import json
-from datetime import datetime
-
-class Evaluator:
+class Critic:
     def __init__(self, safety_manager):
         self.safety_manager = safety_manager
-        self.max_evaluations = 100
         
-    def evaluate(self, result):
+    def evaluate_output(self, result):
         self.safety_manager.record_action()
         
-        total_steps = len(result.get("results", []))
-        successful = sum(1 for r in result.get("results", []) if r.get("completed"))
-        score = 0.85 + (successful * 0.02)
+        total = len(result.get("results", []))
+        verified = sum(1 for r in result.get("results", []) if r.get("verified"))
+        
+        score = verified / total if total > 0 else 0
+        passed = verified == total
         
         return {
-            "score": min(score, 1.0),
-            "passed": successful > 0,
-            "steps_completed": successful,
-            "total_steps": total_steps,
-            "feedback": f"Successfully completed {successful}/{total_steps} steps",
-            "issues": [] if successful == total_steps else ["Some steps need review"]
+            "score": score,
+            "passed": passed,
+            "verified_count": verified,
+            "total_count": total,
+            "feedback": f"{'All' if passed else verified}/{total} steps verified successfully"
         }

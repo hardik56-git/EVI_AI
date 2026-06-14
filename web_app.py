@@ -1,13 +1,12 @@
 import sys
 sys.path.insert(0, '.')
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import EVOAI
 
 app = Flask(__name__)
 CORS(app)
 ai = EVOAI()
-ai.start()
 
 @app.route('/')
 def index():
@@ -156,5 +155,4 @@ def emergency_stop():
     os._exit(0)
 
 if __name__ == '__main__':
-    ai.start()
     app.run(host='127.0.0.1', port=5555, debug=False, threaded=True)

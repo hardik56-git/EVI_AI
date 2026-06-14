@@ -5,50 +5,29 @@ class LanguageGenerator:
     def generate_response(self, goal, plan, result, evaluation):
         self.safety_manager.record_action()
         
-        goal_lower = goal.lower().strip()
+        # Only format what was ACTUALLY verified
+        verified_results = [r for r in result.get("results", []) if r.get("verified")]
+        failed_results = [r for r in result.get("results", []) if not r.get("verified")]
         
-        if goal_lower.startswith(('hi', 'hello', 'hey', 'namaste', 'greeting')):
-            return "Hello! I'm EVO_AI, your self-improvement assistant. How can I help you today?"
+        if goal.lower().startswith(('hi', 'hello', 'hey', 'greetings')):
+            return "Hello! I'm EVO_AI. I execute real tasks and verify every action. What would you like me to do?"
             
-        if any(word in goal_lower for word in ['study', 'learn', 'education', 'course', 'subject']):
-            return self._study_plan_response(goal, result)
+        if failed_results:
+            output = f"I attempted to process '{goal}'.\n\n"
+            output += f"⚠️ Some steps failed:\n"
+            for r in failed_results:
+                output += f"  - {r['step']}: {r.get('details', 'failed')}\n"
+            return output
             
-        if any(word in goal_lower for word in ['code', 'program', 'write', 'create', 'build', 'develop']):
-            return self._coding_response(goal, result)
-            
-        if any(word in goal_lower for word in ['help', 'what', 'can you', 'assist']):
-            return self._help_response()
-            
-        return self._default_response(goal, result, evaluation)
+        output = f"I've processed your request: '{goal}'\n\n"
         
-    def _study_plan_response(self, goal, result):
-        output = f"I've analyzed your request: '{goal}'. Here's my plan:\n\n"
-        for i, step in enumerate(result.get("results", []), 1):
-            output += f"{i}. {step['step']}: {step.get('details', 'Completed')}\n"
-        output += f"\nAll steps completed successfully! Would you like me to dive deeper into any specific area?"
-        return output
+        for i, step in enumerate(verified_results, 1):
+            detail = step.get('details', '')
+            output += f"{i}. {step['step']}: {detail}\n"
+            if 'file' in step:
+                output += f"   (File: {step['file']})\n"
+                
+        output += f"\nAll {len(verified_results)} steps completed and verified!\n"
+        output += f"Score: {int(evaluation.get('score', 0.9) * 100)}%"
         
-    def _coding_response(self, goal, result):
-        output = f"I can help you with '{goal}'. My approach:\n\n"
-        for i, step in enumerate(result.get("results", []), 1):
-            output += f"{i}. {step['step']} - {step.get('details', 'Ready to proceed')}\n"
-        output += f"\nLet me know which programming language you prefer, and I'll generate the code structure!"
-        return output
-        
-    def _help_response(self):
-        return """I can help you with:
-* Study planning and learning schedules  
-* Writing and debugging code
-* Research and analysis tasks
-* Problem-solving and optimization
-
-Just type your request and I'll create a plan to accomplish it.
-Example: 'create a study plan for machine learning' or 'write a Python web scraper'"""
-        
-    def _default_response(self, goal, result, evaluation):
-        output = f"I've processed your request: '{goal}'.\n\n"
-        output += f"The task was {result['status']}.\n"
-        output += f"{evaluation.get('feedback', '')}\n"
-        output += f"Score: {int(evaluation['score']*100)}%\n\n"
-        output += "All steps completed! Ask me for more details or a different approach."
         return output
