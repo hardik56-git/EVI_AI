@@ -5,16 +5,18 @@ class LanguageGenerator:
     def generate_response(self, goal, plan, result, evaluation):
         self.safety_manager.record_action()
         
-        if goal.lower().startswith(('hi', 'hello', 'hey')):
+        goal_lower = goal.lower().strip()
+        
+        if goal_lower.startswith(('hi', 'hello', 'hey', 'namaste', 'greeting')):
             return "Hello! I'm EVO_AI, your self-improvement assistant. How can I help you today?"
             
-        if "study" in goal.lower():
+        if any(word in goal_lower for word in ['study', 'learn', 'education', 'course', 'subject']):
             return self._study_plan_response(goal, result)
             
-        if "code" in goal.lower() or "program" in goal.lower() or "write" in goal.lower() or "create" in goal.lower():
+        if any(word in goal_lower for word in ['code', 'program', 'write', 'create', 'build', 'develop']):
             return self._coding_response(goal, result)
             
-        if "help" in goal.lower() or "what" in goal.lower() or "can you" in goal.lower():
+        if any(word in goal_lower for word in ['help', 'what', 'can you', 'assist']):
             return self._help_response()
             
         return self._default_response(goal, result, evaluation)
@@ -47,5 +49,6 @@ Example: 'create a study plan for machine learning' or 'write a Python web scrap
         output = f"I've processed your request: '{goal}'.\n\n"
         output += f"The task was {result['status']}.\n"
         output += f"{evaluation.get('feedback', '')}\n"
-        output += f"(Score: {int(evaluation['score']*100)}%)"
+        output += f"Score: {int(evaluation['score']*100)}%\n\n"
+        output += "All steps completed! Ask me for more details or a different approach."
         return output
